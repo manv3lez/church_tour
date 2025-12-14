@@ -1,0 +1,8 @@
+{
+  "name": "Sanctuary Tour",
+  "description": "An interactive, multilingual audio guide for church artworks using AI vision and narration.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
