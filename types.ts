@@ -33,7 +33,8 @@ export enum AppState {
 
 export const LOCATION_ZONES = [
   'All Locations',
-  'Entrance',
-  'Nave (Main Church)',
-  'Sanctuary (Altar)',
+  'Entrance Area',
+  'Left Side (Pews)',
+  'Right Side (Pews)',
+  'Sanctuary / Altar',
 ];

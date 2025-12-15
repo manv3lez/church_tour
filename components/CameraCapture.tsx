@@ -1,17 +1,22 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { LOCATION_ZONES } from '../types';
+import { LOCATION_ZONES, LanguageOption } from '../types';
+import { UI_TRANSLATIONS } from '../constants';
 
 interface CameraCaptureProps {
   onCapture: (base64Image: string, location: string) => void;
   onCancel: () => void;
+  selectedLanguage: LanguageOption;
 }
 
-const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onCancel }) => {
+const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onCancel, selectedLanguage }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string>(LOCATION_ZONES[0]);
+
+  // Get translations for current language, fallback to English if missing
+  const t = UI_TRANSLATIONS[selectedLanguage.code] || UI_TRANSLATIONS['en'];
 
   const startCamera = useCallback(async () => {
     try {
@@ -88,21 +93,29 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onCancel }) =>
       </div>
 
       {/* Location Selector Overlay */}
-      <div className="absolute top-16 left-0 right-0 z-20 px-4">
-        <div className="bg-black/50 backdrop-blur-md rounded-xl p-2 border border-white/10">
-          <p className="text-xs text-gray-300 uppercase tracking-widest text-center mb-2">My Location</p>
-          <div className="flex overflow-x-auto gap-2 pb-1 custom-scroll justify-start md:justify-center">
-            {LOCATION_ZONES.map(zone => (
+      <div className="absolute top-12 left-0 right-0 z-20 px-4">
+        <div className="bg-black/60 backdrop-blur-md rounded-xl p-3 border border-white/10 shadow-2xl">
+          <div className="flex items-center justify-center gap-2 mb-2">
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-amber-500">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+             </svg>
+             <p className="text-xs text-amber-100 uppercase tracking-widest font-bold">{t.cameraLocationTitle}</p>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-2">
+            {LOCATION_ZONES.map(zoneKey => (
               <button
-                key={zone}
-                onClick={() => setSelectedLocation(zone)}
-                className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  selectedLocation === zone 
-                    ? 'bg-amber-600 text-white shadow-lg' 
-                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                key={zoneKey}
+                onClick={() => setSelectedLocation(zoneKey)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+                  selectedLocation === zoneKey 
+                    ? 'bg-amber-600 text-white border-amber-500 shadow-lg scale-105' 
+                    : 'bg-neutral-800/80 text-gray-400 border-neutral-700 hover:bg-neutral-700'
                 }`}
               >
-                {zone}
+                {/* Use the mapped translation for the zone key, fallback to key itself if not found */}
+                {t.zones[zoneKey] || zoneKey}
               </button>
             ))}
           </div>

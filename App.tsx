@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AppState, Artwork, LanguageOption, LanguageCode } from './types';
-import { ARTWORKS, PRIMARY_LANGUAGES, OTHER_LANGUAGES } from './constants';
+import { ARTWORKS, PRIMARY_LANGUAGES, OTHER_LANGUAGES, UI_TRANSLATIONS } from './constants';
 import { identifyArtwork, generateAudio, decodeGeminiAudio } from './services/geminiService';
 import CameraCapture from './components/CameraCapture';
 import AudioPlayer from './components/AudioPlayer';
@@ -18,6 +18,9 @@ function App() {
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   
+  // Get current translations based on selectedLanguage
+  const t = UI_TRANSLATIONS[selectedLanguage.code] || UI_TRANSLATIONS['en'];
+
   // Initialize Audio Context on user interaction
   const initAudioContext = () => {
     if (!audioContextRef.current) {
@@ -44,7 +47,6 @@ function App() {
         const artwork = ARTWORKS.find(a => a.id === artworkId);
         if (artwork) {
           setSelectedArtwork(artwork);
-          // Default to English initially or keep previous language? Let's keep previous language if supported, else English
           setAppState(AppState.RESULT);
           await loadAudio(artwork, selectedLanguage);
         } else {
@@ -134,13 +136,31 @@ function App() {
       <div className="min-h-screen bg-neutral-900 text-white flex flex-col items-center justify-center p-6 text-center bg-[url('https://picsum.photos/800/1200?grayscale')] bg-cover bg-center bg-no-repeat relative">
         <div className="absolute inset-0 bg-black/70" />
         <div className="relative z-10 max-w-md w-full">
-          <h1 className="text-5xl font-bold mb-2 text-amber-500 tracking-wider">Sanctuary</h1>
-          <p className="text-xl text-gray-300 font-light italic mb-10">An interactive spiritual journey</p>
+          <h1 className="text-5xl font-bold mb-2 text-amber-500 tracking-wider">Westminster Abbey</h1>
+          <p className="text-xl text-gray-300 font-light italic mb-8">{t.subtitle}</p>
           
           <div className="space-y-6">
+            
+            {/* Language Selector on Home Screen */}
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              {[...PRIMARY_LANGUAGES, ...OTHER_LANGUAGES].map(lang => (
+                <button
+                   key={lang.code}
+                   onClick={() => setSelectedLanguage(lang)}
+                   className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
+                     selectedLanguage.code === lang.code
+                       ? 'bg-amber-600 text-white border-amber-500'
+                       : 'bg-white/10 text-gray-400 border-transparent hover:bg-white/20'
+                   }`}
+                >
+                  {lang.nativeLabel}
+                </button>
+              ))}
+            </div>
+
             <div className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
-              <h3 className="text-lg font-semibold mb-2 text-amber-100">Instructions</h3>
-              <p className="text-sm text-gray-400">Select your location in the church, then point your camera at the sacred art to reveal its story.</p>
+              <h3 className="text-lg font-semibold mb-2 text-amber-100">{t.instructionsTitle}</h3>
+              <p className="text-sm text-gray-400">{t.instructions}</p>
             </div>
 
             <button 
@@ -151,7 +171,7 @@ function App() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
               </svg>
-              Start Tour
+              {t.startBtn}
             </button>
           </div>
         </div>
@@ -164,6 +184,7 @@ function App() {
       <CameraCapture 
         onCapture={handleImageCaptured} 
         onCancel={() => setAppState(AppState.HOME)}
+        selectedLanguage={selectedLanguage}
       />
     );
   }
@@ -195,7 +216,10 @@ function App() {
           {/* Title Area */}
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-serif text-amber-400 mb-2">{selectedArtwork.title}</h2>
-            <div className="text-xs text-amber-500/70 uppercase tracking-widest mb-2">{selectedArtwork.location}</div>
+            {/* Display location in selected language if possible, else English default */}
+            <div className="text-xs text-amber-500/70 uppercase tracking-widest mb-2">
+              {t.zones[selectedArtwork.location] || selectedArtwork.location}
+            </div>
             <div className="h-1 w-20 bg-amber-700 mx-auto rounded-full"></div>
           </div>
 

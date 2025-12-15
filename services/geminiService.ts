@@ -32,21 +32,17 @@ Description: ${a.description}`
   const prompt = `
     You are an expert art historian and iconographer specializing in Catholic church art.
     
-    Task: Identify which of the provided artworks matches the image.
+    LOCATION CONTEXT:
+    The user is currently standing in the "${locationFilter || 'Unknown'}" zone of the church.
+    You must ONLY match the image to one of the Candidate Artworks listed below. 
+    The Candidate Artworks have been strictly filtered to only include those physically present in this zone.
     
-    CONTEXT:
-    The user is standing in the "${locationFilter || 'Unknown'}" area of the church.
-    Only consider the candidates listed below that are found in this location.
-    
-    CRITICAL INSTRUCTION:
-    The provided descriptions are primarily *theological*. 
-    
-    TO IDENTIFY ACCURATELY:
+    Visual Matching Task:
     1. **Visual Analysis**: Analyze the image for specific figures, symbols, and attributes (e.g., Keys=Peter, Sword=Paul, Lily=Joseph, Stone Basin=Baptismal Font).
     2. **Iconography Match**: Match these visual cues to the **Title** of the candidate artworks.
-    3. **Context Confirmation**: Use the **Description** to distinguish between similar subjects.
+    3. **Confirmation**: Use the **Description** to distinguish between similar subjects.
     
-    CANDIDATE ARTWORKS:
+    CANDIDATE ARTWORKS (Zone: ${locationFilter || 'All'}):
     ${artworkContext}
     
     Return a JSON object with a single field "id".
