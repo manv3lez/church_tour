@@ -133,41 +133,69 @@ function App() {
 
   if (appState === AppState.HOME) {
     return (
-      <div className="min-h-screen bg-neutral-900 text-white flex flex-col items-center justify-center p-6 text-center bg-[url('https://picsum.photos/800/1200?grayscale')] bg-cover bg-center bg-no-repeat relative">
-        <div className="absolute inset-0 bg-black/70" />
-        <div className="relative z-10 max-w-md w-full">
-          <h1 className="text-5xl font-bold mb-2 text-amber-500 tracking-wider">Westminster Abbey</h1>
-          <p className="text-xl text-gray-300 font-light italic mb-8">{t.subtitle}</p>
+      <div className="min-h-screen bg-stone-900 text-stone-100 flex flex-col p-0 relative">
+        {/* Background Texture/Gradient for Mission BC Abbey Vibe */}
+        <div className="absolute inset-0 bg-stone-900 z-0">
+          {/* A gradient mimicking the brown tiles and light described in text */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-900/20 via-stone-900 to-stone-950"></div>
+        </div>
+        
+        {/* Main Content Container */}
+        <div className="relative z-10 flex flex-col h-full max-w-2xl mx-auto w-full">
           
-          <div className="space-y-6">
-            
-            {/* Language Selector on Home Screen */}
-            <div className="flex flex-wrap justify-center gap-2 mb-4">
+          {/* Header Section */}
+          <div className="pt-8 pb-4 px-6 text-center border-b border-stone-800">
+            <h1 className="text-3xl md:text-4xl font-serif font-bold text-amber-500 tracking-wider mb-2">Westminster Abbey</h1>
+            <p className="text-sm md:text-base text-stone-400 font-light italic tracking-wide">{t.subtitle}</p>
+          </div>
+
+          {/* Language Selector */}
+          <div className="py-4 px-4 bg-stone-950/50 backdrop-blur-sm border-b border-stone-800">
+            <div className="flex flex-wrap justify-center gap-2">
               {[...PRIMARY_LANGUAGES, ...OTHER_LANGUAGES].map(lang => (
                 <button
                    key={lang.code}
                    onClick={() => setSelectedLanguage(lang)}
-                   className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
+                   className={`px-3 py-1 rounded-md text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all border ${
                      selectedLanguage.code === lang.code
-                       ? 'bg-amber-600 text-white border-amber-500'
-                       : 'bg-white/10 text-gray-400 border-transparent hover:bg-white/20'
+                       ? 'bg-amber-700/80 text-white border-amber-600'
+                       : 'bg-stone-800/50 text-stone-500 border-transparent hover:bg-stone-800'
                    }`}
                 >
                   {lang.nativeLabel}
                 </button>
               ))}
             </div>
+          </div>
 
-            <div className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
-              <h3 className="text-lg font-semibold mb-2 text-amber-100">{t.instructionsTitle}</h3>
-              <p className="text-sm text-gray-400">{t.instructions}</p>
+          {/* Scrollable Intro Text Area */}
+          <div className="flex-1 overflow-y-auto custom-scroll p-6 md:p-8">
+            <div className="prose prose-invert prose-stone mx-auto">
+               <h3 className="text-center font-serif text-amber-200/90 text-xl mb-6">Welcome</h3>
+               {/* Split intro text by newlines for paragraphs */}
+               {t.introText.split('\n\n').map((paragraph: string, idx: number) => (
+                 <p key={idx} className="mb-4 text-stone-300 font-light leading-relaxed text-justify text-sm md:text-base">
+                   {paragraph}
+                 </p>
+               ))}
+               <div className="flex justify-center my-8">
+                  <div className="w-16 h-1 bg-amber-800/50 rounded-full"></div>
+               </div>
             </div>
+          </div>
 
-            <button 
+          {/* Sticky Footer with Action Button */}
+          <div className="p-4 bg-stone-900/90 backdrop-blur-md border-t border-stone-800">
+             <div className="text-center mb-3">
+               <h3 className="text-sm font-semibold text-amber-100/80 uppercase tracking-widest mb-1">{t.instructionsTitle}</h3>
+               <p className="text-xs text-stone-500">{t.instructions}</p>
+             </div>
+             
+             <button 
               onClick={handleStartTour}
-              className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-4 px-8 rounded-full transition-all transform hover:scale-105 shadow-xl shadow-amber-900/50 flex items-center justify-center gap-2"
+              className="w-full bg-amber-700 hover:bg-amber-600 text-white font-serif font-bold py-4 px-8 rounded-lg transition-all transform hover:scale-[1.01] shadow-xl shadow-black/40 flex items-center justify-center gap-3 border border-amber-600/50"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
               </svg>
@@ -191,8 +219,8 @@ function App() {
 
   if (appState === AppState.ANALYZING || (appState === AppState.RESULT && isLoading)) {
     return (
-      <div className="min-h-screen bg-neutral-900 flex flex-col items-center justify-center text-white z-50">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-500 mb-6"></div>
+      <div className="min-h-screen bg-stone-900 flex flex-col items-center justify-center text-white z-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-amber-600 mb-6"></div>
         <p className="text-xl font-light tracking-widest uppercase text-amber-100">{loadingMessage}</p>
       </div>
     );
@@ -200,32 +228,31 @@ function App() {
 
   if (appState === AppState.RESULT && selectedArtwork) {
     return (
-      <div className="min-h-screen bg-neutral-900 text-white flex flex-col">
+      <div className="min-h-screen bg-stone-900 text-stone-100 flex flex-col">
         {/* Header / Nav */}
-        <div className="px-6 py-4 flex justify-between items-center bg-neutral-800 border-b border-neutral-700 sticky top-0 z-30">
-          <button onClick={() => setAppState(AppState.CAMERA)} className="text-amber-500 flex items-center gap-1">
+        <div className="px-6 py-4 flex justify-between items-center bg-stone-800 border-b border-stone-700 sticky top-0 z-30">
+          <button onClick={() => setAppState(AppState.CAMERA)} className="text-amber-500 flex items-center gap-1 hover:text-amber-400 transition-colors">
              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
              </svg>
              Scan Another
           </button>
-          <span className="font-serif text-amber-500/50 text-sm">SANCTUARY TOUR</span>
+          <span className="font-serif text-amber-500/50 text-sm tracking-widest">WESTMINSTER ABBEY</span>
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scroll p-6 pb-32">
           {/* Title Area */}
           <div className="mb-8 text-center">
-            <h2 className="text-3xl font-serif text-amber-400 mb-2">{selectedArtwork.title}</h2>
+            <h2 className="text-3xl font-serif text-amber-500 mb-3">{selectedArtwork.title}</h2>
             {/* Display location in selected language if possible, else English default */}
-            <div className="text-xs text-amber-500/70 uppercase tracking-widest mb-2">
+            <div className="inline-block px-3 py-1 bg-stone-800 rounded text-xs text-stone-400 uppercase tracking-widest mb-2 border border-stone-700">
               {t.zones[selectedArtwork.location] || selectedArtwork.location}
             </div>
-            <div className="h-1 w-20 bg-amber-700 mx-auto rounded-full"></div>
           </div>
 
           {/* Language Selector */}
-          <div className="mb-8">
-            <p className="text-xs uppercase tracking-wider text-gray-500 mb-3 text-center">Select Language</p>
+          <div className="mb-8 bg-stone-800/30 p-4 rounded-xl border border-stone-800">
+            <p className="text-[10px] uppercase tracking-wider text-stone-500 mb-3 text-center">Select Audio Language</p>
             
             {/* Primary Pills */}
             <div className="flex flex-wrap justify-center gap-3 mb-4">
@@ -233,10 +260,10 @@ function App() {
                 <button
                   key={lang.code}
                   onClick={() => handleLanguageChange(lang)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     selectedLanguage.code === lang.code 
-                      ? 'bg-amber-600 text-white shadow-lg shadow-amber-900/40' 
-                      : 'bg-neutral-800 text-gray-400 hover:bg-neutral-700 border border-neutral-700'
+                      ? 'bg-amber-700 text-white shadow-lg shadow-amber-900/40 border border-amber-600' 
+                      : 'bg-stone-800 text-stone-400 hover:bg-stone-700 border border-stone-700'
                   }`}
                 >
                   {lang.nativeLabel}
@@ -247,25 +274,30 @@ function App() {
 
             {/* Secondary Dropdown */}
             <div className="flex justify-center">
-               <select 
-                 className="bg-neutral-800 text-gray-300 text-sm py-2 px-4 rounded-lg border border-neutral-700 focus:outline-none focus:border-amber-500"
-                 onChange={(e) => {
-                   const lang = OTHER_LANGUAGES.find(l => l.code === e.target.value);
-                   if (lang) handleLanguageChange(lang);
-                 }}
-                 value={OTHER_LANGUAGES.find(l => l.code === selectedLanguage.code)?.code || ""}
-               >
-                 <option value="" disabled>More Languages...</option>
-                 {OTHER_LANGUAGES.map(lang => (
-                   <option key={lang.code} value={lang.code}>{lang.label} ({lang.nativeLabel})</option>
-                 ))}
-               </select>
+               <div className="relative">
+                 <select 
+                   className="appearance-none bg-stone-800 text-stone-400 text-sm py-2 pl-4 pr-10 rounded-lg border border-stone-700 focus:outline-none focus:border-amber-600 transition-colors cursor-pointer"
+                   onChange={(e) => {
+                     const lang = OTHER_LANGUAGES.find(l => l.code === e.target.value);
+                     if (lang) handleLanguageChange(lang);
+                   }}
+                   value={OTHER_LANGUAGES.find(l => l.code === selectedLanguage.code)?.code || ""}
+                 >
+                   <option value="" disabled>More Languages</option>
+                   {OTHER_LANGUAGES.map(lang => (
+                     <option key={lang.code} value={lang.code}>{lang.label} ({lang.nativeLabel})</option>
+                   ))}
+                 </select>
+                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-stone-500">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                  </div>
+               </div>
             </div>
           </div>
 
           {/* Original Text (English) display for reference */}
-          <div className="prose prose-invert prose-lg mx-auto bg-neutral-800/30 p-6 rounded-2xl border border-white/5">
-             <p className="leading-relaxed text-gray-300 font-light text-justify">
+          <div className="prose prose-invert prose-stone prose-lg mx-auto bg-stone-800/20 p-6 rounded-xl border border-stone-800">
+             <p className="leading-relaxed text-stone-300 font-light text-justify">
                {selectedArtwork.description}
              </p>
           </div>
@@ -273,7 +305,7 @@ function App() {
         </div>
 
         {/* Sticky Audio Player */}
-        <div className="fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 p-4 pb-8 z-40">
+        <div className="fixed bottom-0 left-0 right-0 bg-stone-900 border-t border-stone-800 p-4 pb-8 z-40 shadow-2xl">
            <AudioPlayer 
              audioBuffer={audioBuffer} 
              isPlaying={isPlaying} 

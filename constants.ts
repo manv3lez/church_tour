@@ -14,11 +14,50 @@ export const OTHER_LANGUAGES: LanguageOption[] = [
   { code: LanguageCode.GERMAN, label: 'German', nativeLabel: 'Deutsch' },
 ];
 
+const INTRO_TEXT_ENGLISH = `Introduction to the Catholic Church
+
+Next to the visitor reception area, you will find a church. We warmly welcome you to step inside and look around. To help you better understand what you see, we have prepared this brief guide.
+
+Although there is a side entrance that visitors often use, we recommend that on your first visit you enter through the main doors (A).
+
+The Catholic Church was founded by Jesus Christ two thousand years ago. However, its preparation reaches back four thousand years, to the time of Abraham. God said to Abraham: “Leave your country, your kindred, and your father’s house, and go to the land that I will show you.” Going even further back, the Church’s roots can be traced to the origins of humanity and the very beginning of creation. The word Catholic originally means “universal,” and the word Church means “assembly.” For this reason, you too are invited and welcomed into the Catholic Church.
+
+Upon entering the church, you may walk down the central aisle and then turn either right or left (B).
+
+The Symbolic Meaning of the Church
+
+“My house shall be called a house of prayer.”
+
+Through Christ, God comes to dwell among us, teaching not only by words but also by His actions and His life. He gave us the perfect example of obedience, so that we might truly become children of our Father. “I always do what pleases Him.” For this reason, Christ invites us to pray sincerely from the heart, just as Christians also pray for all who enter the church with faith, reverence, and awe before God.
+
+“When you pray, go into your inner room, close the door, and pray to your Father who is in secret. And your Father who sees in secret will reward you.”
+
+In fact, Jesus once said that His body is the true temple. Moreover, He desires to make us into His temple as well. As the Apostle Paul wrote: “Do you not know that you are God’s temple?”
+
+Everything within the church building reflects these spiritual realities. The aisle (B) represents the human body; the sanctuary (C) symbolizes the soul; and the altar (D) represents the heart.
+
+The aisle also signifies the path of holiness that purifies the human heart. The sanctuary at the altar symbolizes the beauty of heaven, which becomes clearer to us as we walk the path of God’s commandments. Finally, the altar at the center represents our union with God. When we advance in the path of the commandments—which can be summed up in the complete love of God and neighbor—we gaze upon Jesus on the Cross. At the same time, we also recognize our own irreverence, disobedience, inhumanity, and the sins that led Jesus to give His life for us. Yet the Lord Jesus stretches out His arms toward us—not to condemn, but to save, opening for us the gates of heaven.
+
+During the Mass, the priest and ministers process solemnly up the central aisle toward the altar. The priest then reverently kisses the altar. This entrance rite symbolizes the life of Christ our High Priest—from His birth into the world to His sacrifice on the Cross.
+
+“For God so loved the world that He gave His only Son, so that everyone who believes in Him may not perish but may have eternal life.”
+
+For this reason, when Christians celebrate the Sacrament of Marriage in the church, the bride and groom walk together up the central aisle to the altar to receive the Church’s blessing. Marriage is created by God and symbolizes the holy wedding feast of heaven. Money, bodily pleasures, reputation, or even our own virtues cannot fully satisfy the human heart. Ultimately, we long for the love of God. And here is the Good News: God loves us and calls each one of us to Himself through Jesus Christ.
+
+You may also notice that the interior of the church reflects the whole of visible creation. The brown tiles beneath your feet represent the earth, while the dome represents heaven. Traditionally, Catholic churches are oriented toward the east, for Christians turn to the rising sun—the holy sign of Christ—the true light that shines upon all nations.
+
+The colors of the stained glass windows represent the four elements (air, fire, earth, water) and the four seasons (spring, summer, autumn, winter). The four corners at the center of the church are yellow, because Jesus, who is in our midst, is the Sun of Justice, the Light of the World, the true King who reigns over all. Just as Christ is the holy rising sun, so the Church is the holy assembly of the twelve-fold moon.
+
+The shape of the church symbolizes the mysterious relationship between the Lord Christ and His bride, the Church. The structure of the cross represents Christ’s body and His love for us. The twelve sides of the cross symbolize the mystery of His holy Church and also the foundation He established—namely, the twelve Apostles.
+
+Now, if you return to the entrance (A), we will guide you through the rest of the church.`;
+
 export const UI_TRANSLATIONS: Record<string, any> = {
   [LanguageCode.ENGLISH]: {
-    subtitle: "An interactive spiritual journey",
-    instructionsTitle: "Instructions",
-    instructions: "Select your location in the church, then point your camera at the sacred art to reveal its story.",
+    subtitle: "A Benedictine Monastery in Mission, BC",
+    instructionsTitle: "Start the Audio Tour",
+    introText: INTRO_TEXT_ENGLISH,
+    instructions: "To begin, select your location in the church below, then tap 'Start Tour' to scan the artwork.",
     startBtn: "Start Tour",
     cameraLocationTitle: "Select Your Location",
     zones: {
@@ -30,9 +69,10 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     }
   },
   [LanguageCode.MANDARIN]: {
-    subtitle: "互动心灵之旅",
-    instructionsTitle: "说明",
-    instructions: "请选择您在教堂中的位置，然后用相机对准圣像，聆听它的故事。",
+    subtitle: "位于BC省米逊的本笃会修道院",
+    instructionsTitle: "开始语音导览",
+    introText: INTRO_TEXT_ENGLISH, // Fallback to English for long text
+    instructions: "请在下方选择您在教堂中的位置，然后点击“开始参观”以扫描圣像。",
     startBtn: "开始参观",
     cameraLocationTitle: "选择您的位置",
     zones: {
@@ -44,9 +84,10 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     }
   },
   [LanguageCode.CANTONESE]: {
-    subtitle: "互動心靈之旅",
-    instructionsTitle: "說明",
-    instructions: "請選擇您在教堂中的位置，然後用相機對準聖像，聆聽它的故事。",
+    subtitle: "位於BC省米遜的本篤會修道院",
+    instructionsTitle: "開始語音導覽",
+    introText: INTRO_TEXT_ENGLISH,
+    instructions: "請在下方選擇您在教堂中的位置，然後點擊“開始參觀”以掃描聖像。",
     startBtn: "開始參觀",
     cameraLocationTitle: "選擇您的位置",
     zones: {
@@ -58,9 +99,10 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     }
   },
   [LanguageCode.PUNJABI]: {
-    subtitle: "ਇੱਕ ਇੰਟਰਐਕਟਿਵ ਅਧਿਆਤਮਿਕ ਯਾਤਰਾ",
-    instructionsTitle: "ਹਦਾਇਤਾਂ",
-    instructions: "ਚਰਚ ਵਿੱਚ ਆਪਣਾ ਸਥਾਨ ਚੁਣੋ, ਫਿਰ ਕਲਾਕਾਰੀ ਵੱਲ ਕੈਮਰਾ ਕਰੋ।",
+    subtitle: "ਮਿਸ਼ਨ, ਬੀ.ਸੀ. ਵਿੱਚ ਇੱਕ ਬੈਨੇਡਿਕਟਾਈਨ ਮੱਠ",
+    instructionsTitle: "ਆਡੀਓ ਟੂਰ ਸ਼ੁਰੂ ਕਰੋ",
+    introText: INTRO_TEXT_ENGLISH,
+    instructions: "ਸ਼ੁਰੂ ਕਰਨ ਲਈ, ਹੇਠਾਂ ਆਪਣਾ ਸਥਾਨ ਚੁਣੋ, ਫਿਰ 'ਟੂਰ ਸ਼ੁਰੂ ਕਰੋ' 'ਤੇ ਟੈਪ ਕਰੋ।",
     startBtn: "ਟੂਰ ਸ਼ੁਰੂ ਕਰੋ",
     cameraLocationTitle: "ਆਪਣਾ ਸਥਾਨ ਚੁਣੋ",
     zones: {
@@ -72,9 +114,10 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     }
   },
   [LanguageCode.SPANISH]: {
-    subtitle: "Un viaje espiritual interactivo",
-    instructionsTitle: "Instrucciones",
-    instructions: "Seleccione su ubicación en la iglesia, luego apunte su cámara al arte sagrado.",
+    subtitle: "Un Monasterio Benedictino en Mission, BC",
+    instructionsTitle: "Iniciar el recorrido de audio",
+    introText: INTRO_TEXT_ENGLISH,
+    instructions: "Para comenzar, seleccione su ubicación a continuación, luego toque 'Iniciar Tour'.",
     startBtn: "Iniciar Tour",
     cameraLocationTitle: "Seleccione su ubicación",
     zones: {
@@ -86,9 +129,10 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     }
   },
   [LanguageCode.FRENCH]: {
-    subtitle: "Un voyage spirituel interactif",
-    instructionsTitle: "Instructions",
-    instructions: "Sélectionnez votre emplacement, puis pointez votre caméra vers l'œuvre d'art.",
+    subtitle: "Une abbaye bénédictine à Mission, C.-B.",
+    instructionsTitle: "Commencer la visite audio",
+    introText: INTRO_TEXT_ENGLISH,
+    instructions: "Pour commencer, sélectionnez votre emplacement ci-dessous, puis appuyez sur 'Commencer'.",
     startBtn: "Commencer la visite",
     cameraLocationTitle: "Sélectionnez votre emplacement",
     zones: {
@@ -100,9 +144,10 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     }
   },
   [LanguageCode.ITALIAN]: {
-    subtitle: "Un viaggio spirituale interattivo",
-    instructionsTitle: "Istruzioni",
-    instructions: "Seleziona la tua posizione nella chiesa, poi punta la fotocamera verso l'arte sacra.",
+    subtitle: "Un monastero benedettino a Mission, BC",
+    instructionsTitle: "Inizia il tour audio",
+    introText: INTRO_TEXT_ENGLISH,
+    instructions: "Per iniziare, seleziona la tua posizione qui sotto, poi tocca 'Inizia il tour'.",
     startBtn: "Inizia il tour",
     cameraLocationTitle: "Seleziona la tua posizione",
     zones: {
@@ -114,9 +159,10 @@ export const UI_TRANSLATIONS: Record<string, any> = {
     }
   },
   [LanguageCode.GERMAN]: {
-    subtitle: "Eine interaktive spirituelle Reise",
-    instructionsTitle: "Anleitung",
-    instructions: "Wählen Sie Ihren Standort in der Kirche und richten Sie Ihre Kamera auf das heilige Kunstwerk.",
+    subtitle: "Ein Benediktinerkloster in Mission, BC",
+    instructionsTitle: "Audiotour starten",
+    introText: INTRO_TEXT_ENGLISH,
+    instructions: "Wählen Sie unten Ihren Standort aus und tippen Sie dann auf 'Tour starten'.",
     startBtn: "Tour starten",
     cameraLocationTitle: "Wählen Sie Ihren Standort",
     zones: {
