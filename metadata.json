@@ -1,5 +1,5 @@
 {
-  "name": "Sanctuary Tour",
+  "name": "Interactive Tour of Westminster Abbey Church",
   "description": "An interactive, multilingual audio guide for church artworks using AI vision and narration.",
   "requestFramePermissions": [
     "camera",

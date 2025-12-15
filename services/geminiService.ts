@@ -84,8 +84,9 @@ Description: ${a.description}`
 /**
  * Generates audio for a given text in a specific language.
  * Uses a two-step process: Translate (if needed) -> TTS.
+ * Returns both the audio data and the text (translated if applicable).
  */
-export const generateAudio = async (text: string, language: LanguageOption): Promise<string> => {
+export const generateAudio = async (text: string, language: LanguageOption): Promise<{ audioData: string, translatedText: string }> => {
   try {
     let textToSpeak = text;
 
@@ -93,7 +94,7 @@ export const generateAudio = async (text: string, language: LanguageOption): Pro
     if (language.code !== LanguageCode.ENGLISH) {
       const translationResponse = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
-        contents: `Translate the following religious artwork description into ${language.label} (${language.code}). Maintain a respectful, reverent tone suitable for a church tour. \n\nOriginal Text: "${text}"`,
+        contents: `Translate the following religious text into ${language.label} (${language.code}). Maintain a respectful, reverent tone suitable for a church tour. Do not add markdown formatting.\n\nOriginal Text: "${text}"`,
       });
       textToSpeak = translationResponse.text || text;
     }
@@ -119,7 +120,10 @@ export const generateAudio = async (text: string, language: LanguageOption): Pro
       throw new Error("No audio data received from Gemini.");
     }
 
-    return audioData;
+    return { 
+      audioData, 
+      translatedText: textToSpeak 
+    };
 
   } catch (error) {
     console.error("Error generating audio:", error);
