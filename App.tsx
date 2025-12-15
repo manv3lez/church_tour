@@ -33,12 +33,12 @@ function App() {
     setAppState(AppState.CAMERA);
   };
 
-  const handleImageCaptured = async (base64: string) => {
+  const handleImageCaptured = async (base64: string, location: string) => {
     setAppState(AppState.ANALYZING);
-    setLoadingMessage('Analyzing Artwork...');
+    setLoadingMessage(`Searching ${location}...`);
     
     try {
-      const artworkId = await identifyArtwork(base64);
+      const artworkId = await identifyArtwork(base64, location);
       
       if (artworkId) {
         const artwork = ARTWORKS.find(a => a.id === artworkId);
@@ -52,7 +52,7 @@ function App() {
           throw new Error("Artwork identified but details missing.");
         }
       } else {
-        alert("Sorry, could not identify this artwork. Please try getting closer or better lighting.");
+        alert("Sorry, could not identify this artwork in the selected location. Please ensure you selected the correct zone.");
         setAppState(AppState.CAMERA);
       }
     } catch (error) {
@@ -140,7 +140,7 @@ function App() {
           <div className="space-y-6">
             <div className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
               <h3 className="text-lg font-semibold mb-2 text-amber-100">Instructions</h3>
-              <p className="text-sm text-gray-400">Point your camera at the sacred art within the church to reveal its story and spiritual meaning.</p>
+              <p className="text-sm text-gray-400">Select your location in the church, then point your camera at the sacred art to reveal its story.</p>
             </div>
 
             <button 
@@ -195,6 +195,7 @@ function App() {
           {/* Title Area */}
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-serif text-amber-400 mb-2">{selectedArtwork.title}</h2>
+            <div className="text-xs text-amber-500/70 uppercase tracking-widest mb-2">{selectedArtwork.location}</div>
             <div className="h-1 w-20 bg-amber-700 mx-auto rounded-full"></div>
           </div>
 

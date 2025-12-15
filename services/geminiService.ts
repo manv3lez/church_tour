@@ -7,13 +7,25 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
  * Identifies the artwork from a base64 image string.
+ * @param base64Image The image data.
+ * @param locationFilter Optional filter for the location (e.g., 'Entrance').
  */
-export const identifyArtwork = async (base64Image: string): Promise<string | null> => {
-  // Pass the full description to the model so it can pick up on details like "wooden statue" vs "painting"
-  // or specific location hints (left of entrance, etc) if visible in context.
-  const artworkContext = ARTWORKS.map(a => 
+export const identifyArtwork = async (base64Image: string, locationFilter?: string): Promise<string | null> => {
+  // Filter the candidates based on location. 
+  // This drastically reduces the search space and improves accuracy.
+  let candidates = ARTWORKS;
+  if (locationFilter && locationFilter !== 'All Locations') {
+    candidates = ARTWORKS.filter(a => a.location === locationFilter);
+  }
+
+  // Debug log to see how many candidates we are checking against
+  console.log(`Identifying against ${candidates.length} candidates in zone: ${locationFilter}`);
+
+  // Prepare context
+  const artworkContext = candidates.map(a => 
     `ID: ${a.id}
 Title: ${a.title}
+Location: ${a.location}
 Description: ${a.description}`
   ).join('\n---\n');
   
@@ -22,13 +34,17 @@ Description: ${a.description}`
     
     Task: Identify which of the provided artworks matches the image.
     
+    CONTEXT:
+    The user is standing in the "${locationFilter || 'Unknown'}" area of the church.
+    Only consider the candidates listed below that are found in this location.
+    
     CRITICAL INSTRUCTION:
-    The provided descriptions below are primarily *theological* and *devotional*. They may not fully describe the visual appearance of the art.
+    The provided descriptions are primarily *theological*. 
     
     TO IDENTIFY ACCURATELY:
     1. **Visual Analysis**: Analyze the image for specific figures, symbols, and attributes (e.g., Keys=Peter, Sword=Paul, Lily=Joseph, Stone Basin=Baptismal Font).
-    2. **Iconography Match**: Match these visual cues to the **Title** of the candidate artworks using your knowledge of Catholic iconography.
-    3. **Context Confirmation**: Use the **Description** to distinguish between similar subjects (e.g., if one Saint Joseph is a "wooden statue" and another is a "painting" or "with Child Jesus", use those details).
+    2. **Iconography Match**: Match these visual cues to the **Title** of the candidate artworks.
+    3. **Context Confirmation**: Use the **Description** to distinguish between similar subjects.
     
     CANDIDATE ARTWORKS:
     ${artworkContext}
@@ -38,7 +54,6 @@ Description: ${a.description}`
   `;
 
   try {
-    // Upgrading to gemini-3-pro-preview for superior visual reasoning and "needle in a haystack" retrieval
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: {

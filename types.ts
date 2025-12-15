@@ -2,6 +2,7 @@ export interface Artwork {
   id: string;
   title: string;
   description: string;
+  location: string; // New field for filtering
 }
 
 export enum LanguageCode {
@@ -19,7 +20,7 @@ export interface LanguageOption {
   code: LanguageCode;
   label: string;
   nativeLabel: string;
-  voiceName?: string; // Hint for TTS if needed, though we rely on auto-detect
+  voiceName?: string;
 }
 
 export enum AppState {
@@ -29,3 +30,10 @@ export enum AppState {
   RESULT = 'RESULT',
   ERROR = 'ERROR',
 }
+
+export const LOCATION_ZONES = [
+  'All Locations',
+  'Entrance',
+  'Nave (Main Church)',
+  'Sanctuary (Altar)',
+];
