@@ -9,22 +9,38 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
  * Identifies the artwork from a base64 image string.
  */
 export const identifyArtwork = async (base64Image: string): Promise<string | null> => {
-  // We prepare a prompt that lists the possibilities to help the model narrow it down.
-  const artworkContext = ARTWORKS.map(a => `ID: ${a.id}, Title: ${a.title}, Desc: ${a.description.substring(0, 50)}...`).join('\n');
+  // Pass the full description to the model so it can pick up on details like "wooden statue" vs "painting"
+  // or specific location hints (left of entrance, etc) if visible in context.
+  const artworkContext = ARTWORKS.map(a => 
+    `ID: ${a.id}
+Title: ${a.title}
+Description: ${a.description}`
+  ).join('\n---\n');
   
   const prompt = `
-    You are an art guide in a church. Look at this image. 
-    It corresponds to one of the following artworks defined by their ID and description:
+    You are an expert art historian and iconographer specializing in Catholic church art.
     
+    Task: Identify which of the provided artworks matches the image.
+    
+    CRITICAL INSTRUCTION:
+    The provided descriptions below are primarily *theological* and *devotional*. They may not fully describe the visual appearance of the art.
+    
+    TO IDENTIFY ACCURATELY:
+    1. **Visual Analysis**: Analyze the image for specific figures, symbols, and attributes (e.g., Keys=Peter, Sword=Paul, Lily=Joseph, Stone Basin=Baptismal Font).
+    2. **Iconography Match**: Match these visual cues to the **Title** of the candidate artworks using your knowledge of Catholic iconography.
+    3. **Context Confirmation**: Use the **Description** to distinguish between similar subjects (e.g., if one Saint Joseph is a "wooden statue" and another is a "painting" or "with Child Jesus", use those details).
+    
+    CANDIDATE ARTWORKS:
     ${artworkContext}
     
-    Analyze the visual features. Return a JSON object with a single field "id" matching the ID of the artwork. 
-    If the image does not plausibly match any of these, return "id": "UNKNOWN".
+    Return a JSON object with a single field "id".
+    If the image clearly does not match any of the candidates, return "id": "UNKNOWN".
   `;
 
   try {
+    // Upgrading to gemini-3-pro-preview for superior visual reasoning and "needle in a haystack" retrieval
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-pro-preview',
       contents: {
         parts: [
           { inlineData: { mimeType: 'image/jpeg', data: base64Image } },
