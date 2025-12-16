@@ -1,3 +1,4 @@
+
 export interface Artwork {
   id: string;
   title: string;
@@ -38,3 +39,11 @@ export const LOCATION_ZONES = [
   'Right Side (Pews)',
   'Sanctuary / Altar',
 ];
+
+export interface FeedbackLog {
+  timestamp: string;
+  originalImageHash?: string; // In a real app, hash the image to track the visual data
+  incorrectId: string;
+  correctedId: string;
+  userLocation: string;
+}

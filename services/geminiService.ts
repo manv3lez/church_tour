@@ -1,6 +1,6 @@
 import { GoogleGenAI, Modality, Type } from "@google/genai";
 import { ARTWORKS } from "../constants";
-import { LanguageCode, LanguageOption } from "../types";
+import { LanguageCode, LanguageOption, FeedbackLog } from "../types";
 
 // Initialize Gemini
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -159,4 +159,22 @@ export const decodeGeminiAudio = async (base64Data: string, audioContext: AudioC
     }
 
     return buffer;
+};
+
+/**
+ * Logs a correction event.
+ * In a real production app, this would send data to a backend/analytics service
+ * to help fine-tune the model.
+ */
+export const logCorrection = async (feedback: FeedbackLog): Promise<void> => {
+  // Simulate network request
+  console.log('--- FEEDBACK LOGGED ---');
+  console.log('Timestamp:', feedback.timestamp);
+  console.log('Location:', feedback.userLocation);
+  console.log('Incorrect AI ID:', feedback.incorrectId);
+  console.log('User Corrected ID:', feedback.correctedId);
+  console.log('-----------------------');
+  
+  // Return resolved promise
+  return Promise.resolve();
 };

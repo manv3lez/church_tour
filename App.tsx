@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AppState, Artwork, LanguageOption, LanguageCode } from './types';
 import { ARTWORKS, PRIMARY_LANGUAGES, OTHER_LANGUAGES, UI_TRANSLATIONS } from './constants';
-import { identifyArtwork, generateAudio, decodeGeminiAudio } from './services/geminiService';
+import { identifyArtwork, generateAudio, decodeGeminiAudio, logCorrection } from './services/geminiService';
 import CameraCapture from './components/CameraCapture';
 import AudioPlayer from './components/AudioPlayer';
 
@@ -12,6 +12,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   
+  // Feedback / Correction State
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+
   // Content State (for Translation)
   // We maintain the displayed text separately so we can update it after translation
   const [displayedIntroText, setDisplayedIntroText] = useState<string>(UI_TRANSLATIONS['en'].introText);
@@ -115,6 +118,29 @@ function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCorrection = async (correctArtwork: Artwork) => {
+    if (!selectedArtwork) return;
+
+    // 1. Log the feedback
+    await logCorrection({
+      timestamp: new Date().toISOString(),
+      userLocation: selectedArtwork.location,
+      incorrectId: selectedArtwork.id,
+      correctedId: correctArtwork.id
+    });
+
+    // 2. Close modal
+    setShowFeedbackModal(false);
+
+    // 3. Update State to correct artwork
+    setSelectedArtwork(correctArtwork);
+    // Reset text immediately so users see change
+    setDisplayedArtworkDescription(correctArtwork.description); 
+    
+    // 4. Trigger reload of audio/translation for the new artwork
+    await loadContent(correctArtwork.description, selectedLanguage, false);
   };
 
   const playAudio = (buffer: AudioBuffer) => {
@@ -283,7 +309,56 @@ function App() {
 
   if (appState === AppState.RESULT && selectedArtwork) {
     return (
-      <div className="min-h-screen bg-stone-900 text-stone-100 flex flex-col">
+      <div className="min-h-screen bg-stone-900 text-stone-100 flex flex-col relative">
+        
+        {/* FEEDBACK MODAL */}
+        {showFeedbackModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div className="bg-stone-800 border border-stone-600 rounded-xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+              <div className="p-4 bg-stone-900 border-b border-stone-700 flex justify-between items-center">
+                <h3 className="font-serif text-amber-500 font-bold">Select Correct Artwork</h3>
+                <button onClick={() => setShowFeedbackModal(false)} className="text-stone-400 hover:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="overflow-y-auto p-4 flex flex-col gap-2 custom-scroll">
+                <p className="text-xs text-stone-400 mb-2">
+                  Showing artworks in: <span className="text-amber-100">{selectedArtwork.location}</span>
+                </p>
+                {ARTWORKS.filter(a => a.location === selectedArtwork.location && a.id !== selectedArtwork.id).map(art => (
+                  <button 
+                    key={art.id}
+                    onClick={() => handleCorrection(art)}
+                    className="text-left p-3 rounded bg-stone-700/50 hover:bg-stone-700 border border-stone-600 hover:border-amber-600 transition-all group"
+                  >
+                    <div className="font-bold text-stone-200 group-hover:text-amber-400 text-sm">{art.title}</div>
+                    <div className="text-[10px] text-stone-500 line-clamp-1">{art.description}</div>
+                  </button>
+                ))}
+                {/* Fallback if list is empty or user wants others */}
+                {ARTWORKS.filter(a => a.location !== selectedArtwork.location).length > 0 && (
+                  <>
+                    <div className="h-px bg-stone-700 my-2"></div>
+                    <p className="text-xs text-stone-500 mb-1">Other Zones:</p>
+                    {ARTWORKS.filter(a => a.location !== selectedArtwork.location).map(art => (
+                      <button 
+                        key={art.id}
+                        onClick={() => handleCorrection(art)}
+                        className="text-left p-3 rounded bg-stone-700/20 hover:bg-stone-700 border border-transparent hover:border-amber-600 transition-all group"
+                      >
+                         <div className="font-bold text-stone-400 group-hover:text-amber-400 text-sm">{art.title}</div>
+                         <div className="text-[10px] text-stone-600 uppercase">{t.zones[art.location] || art.location}</div>
+                      </button>
+                    ))}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header / Nav */}
         <div className="px-6 py-4 flex justify-between items-center bg-stone-800 border-b border-stone-700 sticky top-0 z-30">
           <button onClick={() => setAppState(AppState.CAMERA)} className="text-amber-500 flex items-center gap-1 hover:text-amber-400 transition-colors">
@@ -299,8 +374,21 @@ function App() {
           {/* Title Area */}
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-serif text-amber-500 mb-3">{selectedArtwork.title}</h2>
-            <div className="inline-block px-3 py-1 bg-stone-800 rounded text-xs text-stone-400 uppercase tracking-widest mb-2 border border-stone-700">
-              {t.zones[selectedArtwork.location] || selectedArtwork.location}
+            <div className="flex flex-col items-center gap-2">
+              <div className="inline-block px-3 py-1 bg-stone-800 rounded text-xs text-stone-400 uppercase tracking-widest border border-stone-700">
+                {t.zones[selectedArtwork.location] || selectedArtwork.location}
+              </div>
+              
+              {/* FEEDBACK LINK */}
+              <button 
+                onClick={() => setShowFeedbackModal(true)}
+                className="text-[10px] text-stone-500 underline decoration-stone-600 hover:text-amber-600 hover:decoration-amber-600 transition-colors mt-1 flex items-center gap-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                Not the correct artwork? Fix it here.
+              </button>
             </div>
           </div>
 

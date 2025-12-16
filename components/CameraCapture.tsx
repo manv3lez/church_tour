@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { LOCATION_ZONES, LanguageOption } from '../types';
 import { UI_TRANSLATIONS } from '../constants';
+import ChurchMap from './ChurchMap';
 
 interface CameraCaptureProps {
   onCapture: (base64Image: string, location: string) => void;
@@ -13,7 +14,8 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onCancel, sele
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<string>(LOCATION_ZONES[0]);
+  const [selectedLocation, setSelectedLocation] = useState<string>('Entrance Area'); // Default to Entrance for map logic
+  const [isMapExpanded, setIsMapExpanded] = useState(false); // Can toggle map size if needed
 
   // Get translations for current language, fallback to English if missing
   const t = UI_TRANSLATIONS[selectedLanguage.code] || UI_TRANSLATIONS['en'];
@@ -84,41 +86,58 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onCancel, sele
 
   return (
     <div className="flex flex-col items-center justify-center h-full w-full bg-black relative">
-      <div className="absolute top-4 right-4 z-20">
-         <button onClick={() => { stopCamera(); onCancel(); }} className="text-white p-2">
+      <div className="absolute top-4 right-4 z-30">
+         <button onClick={() => { stopCamera(); onCancel(); }} className="text-white p-2 bg-black/40 rounded-full backdrop-blur hover:bg-black/60 transition-colors">
            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
            </svg>
          </button>
       </div>
 
-      {/* Location Selector Overlay */}
-      <div className="absolute top-12 left-0 right-0 z-20 px-4">
-        <div className="bg-black/60 backdrop-blur-md rounded-xl p-3 border border-white/10 shadow-2xl">
-          <div className="flex items-center justify-center gap-2 mb-2">
-             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-amber-500">
+      {/* Interactive Map HUD */}
+      <div className="absolute top-4 left-4 z-20">
+        <div className="bg-stone-900/60 backdrop-blur-md rounded-xl p-3 border border-stone-600/30 shadow-2xl flex flex-col items-center w-32 md:w-40 transition-all duration-300">
+          <div className="flex items-center gap-1 mb-2 w-full justify-center opacity-80">
+             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3 text-amber-500">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
              </svg>
-             <p className="text-xs text-amber-100 uppercase tracking-widest font-bold">{t.cameraLocationTitle}</p>
+             <span className="text-[10px] text-amber-100 uppercase tracking-widest font-bold truncate">
+                {t.cameraLocationTitle}
+             </span>
           </div>
           
-          <div className="flex flex-wrap justify-center gap-2">
-            {LOCATION_ZONES.map(zoneKey => (
-              <button
-                key={zoneKey}
-                onClick={() => setSelectedLocation(zoneKey)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
-                  selectedLocation === zoneKey 
-                    ? 'bg-amber-600 text-white border-amber-500 shadow-lg scale-105' 
-                    : 'bg-neutral-800/80 text-gray-400 border-neutral-700 hover:bg-neutral-700'
-                }`}
-              >
-                {/* Use the mapped translation for the zone key, fallback to key itself if not found */}
-                {t.zones[zoneKey] || zoneKey}
-              </button>
-            ))}
+          <div className="w-full aspect-[3/4] mb-2">
+            <ChurchMap 
+                selectedLocation={selectedLocation}
+                onSelectLocation={setSelectedLocation}
+                labels={{
+                  altar: "Altar",
+                  left: "Left",
+                  right: "Right",
+                  entrance: "Back"
+                }}
+            />
           </div>
+
+          <div className="w-full text-center">
+             <p className="text-[10px] text-stone-300 mb-1 leading-tight">Selected Zone:</p>
+             <p className="text-xs text-amber-500 font-bold uppercase tracking-wider leading-tight break-words">
+                {t.zones[selectedLocation] || selectedLocation}
+             </p>
+          </div>
+          
+          {/* Quick Select 'All' fallback */}
+          <button 
+             onClick={() => setSelectedLocation('All Locations')}
+             className={`mt-2 w-full text-[9px] py-1 rounded border uppercase tracking-wide transition-colors ${
+               selectedLocation === 'All Locations' 
+                 ? 'bg-amber-700/80 text-white border-amber-600' 
+                 : 'bg-stone-800/50 text-stone-500 border-stone-700 hover:bg-stone-800'
+             }`}
+           >
+             {t.zones['All Locations'] || 'Scan All'}
+           </button>
         </div>
       </div>
 
@@ -135,9 +154,11 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onCancel, sele
             {/* Shutter Button */}
             <button 
               onClick={handleCapture}
-              className="w-20 h-20 rounded-full border-4 border-white bg-white/20 backdrop-blur-sm active:scale-95 transition-transform"
+              className="w-20 h-20 rounded-full border-4 border-white bg-white/20 backdrop-blur-sm active:scale-95 transition-transform hover:bg-white/30"
               aria-label="Take photo"
-            />
+            >
+              <div className="w-full h-full rounded-full border-2 border-transparent" />
+            </button>
           </div>
         </div>
       ) : (
@@ -151,7 +172,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture, onCancel, sele
 
       {/* Fallback File Input */}
       <div className="absolute bottom-10 right-8 z-10">
-         <label className="flex items-center justify-center w-12 h-12 bg-gray-800 rounded-full cursor-pointer shadow-lg border border-gray-600">
+         <label className="flex items-center justify-center w-12 h-12 bg-gray-900/80 backdrop-blur rounded-full cursor-pointer shadow-lg border border-gray-600 hover:bg-gray-800 transition-colors">
            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
            </svg>

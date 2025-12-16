@@ -2,10 +2,6 @@
 
 An intelligent, multilingual interactive guide designed for visitors of Westminster Abbey in Mission, British Columbia. This web application utilizes Google's Gemini AI to visually identify works of art within the church and generates real-time, translated audio narrations for a seamless self-guided tour experience.
 
-**Try it live at:** [churchtour.netlify.app/](https://churchtour.netlify.app/) | 
-**See and contribute to the Code at:** [github.com/manv3lez/church_tour](https://github.com/manv3lez/church_tour)
-
-
 ## 🌟 Features
 
 *   **AI Visual Recognition:** Uses **Gemini 3 Pro** to analyze camera input and identify specific artworks based on the user's location within the church (Nave, Sanctuary, Side Aisles, etc.).
